@@ -17,6 +17,12 @@
     "autoload": {
         "psr-4": {
             "Deployer\\": "recipes/"
-        }
+        },
+        "files": [
+            "recipes/assets.php",
+            "recipes/cleanup.php",
+            "recipes/db.php",
+            "recipes/uploads.php"
+        ]
     }
 }
