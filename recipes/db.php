@@ -5,32 +5,14 @@
 
 namespace Deployer;
 
+require __DIR__ . '/vendor/autoload.php';
+require_once 'recipe/common.php';
+
 use DotEnv;
 
 // BACKUP DB REMOTE TO LOCAL
 
-task('db:remote:backup', function() {
-
-    $config = get('wp-recipes');
-
-    $now = time();
-    set('dump_path', $config['shared_dir']);
-    set('dump_file', $config['theme_name']  . $now . '.sql');
-    set('dump_filepath', get('dump_path') . get('dump_file'));
-
-    writeln('<comment>> Remote dump : <info>' . get('dump_file') .' </info></comment>');
-    run('mkdir -p ' . get('dump_path'));
-    run('cd {{deploy_path}}/current/ && wp db export ' . get('dump_filepath') . ' --add-drop-table');
-
-    runLocally('mkdir -p .data/db_backups');
-    download(get('dump_filepath'), '.data/db_backups/' .  get('dump_file'));
-
-})->desc('Download backup database');
-
-// BACKUP DB LOCAL TO REMOTE
-
-task('db:local:backup', function() {
-
+task('db:remote:backup', function () {
     $config = get('wp-recipes');
 
     $now = time();
@@ -38,58 +20,71 @@ task('db:local:backup', function() {
     set('dump_file', $config['theme_name'] . $now . '.sql');
     set('dump_filepath', get('dump_path') . get('dump_file'));
 
-    writeln('<comment>> Local dump : <info>' . get('dump_file') .' </info></comment>');
+    writeln('<comment>> Remote dump : <info>' . get('dump_file') . ' </info></comment>');
+    run('mkdir -p ' . get('dump_path'));
+    run('cd {{deploy_path}}/current/ && wp db export ' . get('dump_filepath') . ' --add-drop-table');
+
+    runLocally('mkdir -p .data/db_backups');
+    download(get('dump_filepath'), '.data/db_backups/' . get('dump_file'));
+})->desc('Download backup database');
+
+// BACKUP DB LOCAL TO REMOTE
+
+task('db:local:backup', function () {
+    $config = get('wp-recipes');
+
+    $now = time();
+    set('dump_path', $config['shared_dir']);
+    set('dump_file', $config['theme_name'] . $now . '.sql');
+    set('dump_filepath', get('dump_path') . get('dump_file'));
+
+    writeln('<comment>> Local dump : <info>' . get('dump_file') . ' </info></comment>');
     runLocally('mkdir -p .data/db_backups');
     runLocally('wp db export .data/db_backups/' . get('dump_file') . ' --add-drop-table');
 
     run('mkdir -p ' . get('dump_path'));
-    upload('.data/db_backups/' . get('dump_file'),  get('dump_filepath'));
-
+    upload('.data/db_backups/' . get('dump_file'), get('dump_filepath'));
 })->desc('Upload backup database');
 
 // CREATE DB
 
-task('db:create', function() {
+task('db:create', function () {
     writeln('<comment>> Create database. </comment>');
     run('cd {{deploy_path}}/current/ && wp db create');
-
 })->desc('Exports DB');
 
 // PULL DB
 
-task('db:cmd:pull', function() {
+task('db:cmd:pull', function () {
     writeln('<comment>> Imports remote db to local :<info>' . get('dump_file') . '</info> </comment>');
     runLocally('wp db import .data/db_backups/' . get('dump_file'));
     runLocally('wp search-replace ' . get('remote_url') . ' ' . get('local_url'));
     runLocally('wp search-replace ' . addslashes(get('remote_url')) . ' ' . addslashes(get('local_url')));
     runLocally('rm -f .data/db_backups/' . get('dump_file'));
-
 })->desc('Imports DB');
 
 // PUSH DB
 
-task('db:cmd:push', function() {
+task('db:cmd:push', function () {
     writeln('<comment>> Exports local db to remote : <info>' . get('dump_file') . '</info>... </comment>');
     run('cd {{deploy_path}}/current && wp db import ' . get('dump_filepath'));
     run('cd {{deploy_path}}/current && wp search-replace ' . get('local_url') . ' ' . get('remote_url'));
-    run('rm -f ' . get('dump_filepath') );
-
+    run('rm -f ' . get('dump_filepath'));
 })->desc('Exports DB');
 
 // GET ENV WP SITE URL
 
-task('env:uri', function() {
-
+task('env:uri', function () {
     $config = get('wp-recipes');
 
-    if ( ($config['local_wp_url'] === '') || ($config['remote_wp_url'] === '') ) {
+    if (($config['local_wp_url'] === '') || ($config['remote_wp_url'] === '')) {
         writeln('working with env files');
         $tmp_dir = dirname(__DIR__) . '/../.tmp/';
         $local_env = '.local.env';
         $remote_env = '.remote.env';
 
         runLocally('mkdir -p ' . $tmp_dir);
-        runLocally('cp .env ' . $tmp_dir . $local_env );
+        runLocally('cp .env ' . $tmp_dir . $local_env);
         download($config['shared_dir'] . '/.env', $tmp_dir . $remote_env);
 
         $dotenvremote = new Dotenv\Dotenv($tmp_dir, $remote_env);
@@ -112,7 +107,6 @@ task('env:uri', function() {
         set('local_url', $config['local_wp_url']);
         set('remote_url', $config['remote_wp_url']);
     }
-
 })->desc('Download backup database');
 
 /* --------------------- */

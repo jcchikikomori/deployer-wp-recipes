@@ -5,8 +5,10 @@
 
 namespace Deployer;
 
-task('deploy:cleanup', function() {
+require __DIR__ . '/vendor/autoload.php';
+require_once 'recipe/common.php';
 
+task('deploy:cleanup', function () {
     $config = get('wp-recipes');
 
     writeln('<comment>> Cleanin\'up that mess ... !</comment>');
@@ -16,6 +18,4 @@ task('deploy:cleanup', function() {
     foreach ($targets as $element) {
         run('rm -rf {{release_path}}/' . $element);
     }
-
 })->desc('Upload dist assets folder');
-?>
