@@ -17,6 +17,8 @@ These recipes were originally written by [cstaelen](https://github.com/cstaelen)
 
 ## Installation
 
+Add this repo url to `composer.json` first ([info](https://gemfury.com/help/php-composer-server)). Then run `composer require jcchikikomori/deployer-wp-recipes`.
+
 If you're using phpdotenv, run `composer require vlucas/phpdotenv`.
 
 Make sure to include recipe files in your `deploy.php`:
