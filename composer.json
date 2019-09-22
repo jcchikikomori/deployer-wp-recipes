@@ -1,5 +1,5 @@
 {
-    "name": "cstaelen/deployer-wp-recipes",
+    "name": "jcchikikomori/deployer-wp-recipes",
     "description": "Wordpress deployer recipes",
     "type": "library",
     "license": "MIT",
@@ -7,6 +7,10 @@
         {
             "name": "cstaelen",
             "email": "clement@ukhom.com"
+        },
+        {
+            "name": "jcchikikomori",
+            "email": "jccorsanes@protonmail.com"
         }
     ],
     "minimum-stability": "stable",
